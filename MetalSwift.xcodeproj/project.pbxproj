@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		081C5C4A2EA3296E000B435E /* MetalVectorAdder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 081C5C492EA3296E000B435E /* MetalVectorAdder.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXCopyFilesBuildPhase section */
 		08ACBF582EA0825F0020CA6B /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -19,6 +23,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		081C5C492EA3296E000B435E /* MetalVectorAdder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalVectorAdder.swift; sourceTree = "<group>"; };
 		08ACBF5A2EA0825F0020CA6B /* MetalSwift */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = MetalSwift; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -46,6 +51,7 @@
 			children = (
 				08ACBF5C2EA0825F0020CA6B /* MetalSwift */,
 				08ACBF5B2EA0825F0020CA6B /* Products */,
+				081C5C492EA3296E000B435E /* MetalVectorAdder.swift */,
 			);
 			sourceTree = "<group>";
 		};
@@ -121,6 +127,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				081C5C4A2EA3296E000B435E /* MetalVectorAdder.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
