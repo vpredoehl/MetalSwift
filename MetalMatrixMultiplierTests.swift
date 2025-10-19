@@ -1,7 +1,7 @@
 import Foundation
 import Testing
 
-@testable import YourAppModuleName
+@testable import MetalSwift
 
 @Suite("MetalMatrixMultiplier tests")
 struct MetalMatrixMultiplierTests {
@@ -22,7 +22,6 @@ struct MetalMatrixMultiplierTests {
         return c
     }
 
-    @Test("Float32 tiled matmul matches CPU reference")
     func testF32Correctness() async throws {
         let m = 7, k = 9, n = 5
         var a = [Float]()
@@ -40,7 +39,6 @@ struct MetalMatrixMultiplierTests {
         }
     }
 
-    @Test("Float16 conversion + matmul runs and returns finite values")
     func testF16RoundTripAndMatmul() async throws {
         let m = 8, k = 8, n = 8
         let a32 = (0..<(m*k)).map { i in Float((i % 7) - 3) / 2.0 }
@@ -59,7 +57,6 @@ struct MetalMatrixMultiplierTests {
         }
     }
 
-    @Test("Benchmark helper returns a candidate tile size")
     func testBenchmarkHelper() async throws {
         let m = 32, k = 32, n = 32
         let a = (0..<(m*k)).map { _ in Float.random(in: -1...1) }
