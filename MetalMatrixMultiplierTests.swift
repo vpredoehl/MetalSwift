@@ -70,4 +70,24 @@ struct MetalMatrixMultiplierTests {
         #expect([8,16].contains(best))
         #expect(avgMs > 0)
     }
+
+    @Test("Matmul then Add (GPU+GPU) matches CPU reference")
+    func testMatmulThenAddGPU() async throws {
+        let m = 6, k = 5, n = 4
+        let a = (0..<(m*k)).map { Float(($0 * 7) % 13) / 3.0 }
+        let b = (0..<(k*n)).map { Float(($0 * 11) % 17) / 5.0 }
+        let d = (0..<(m*n)).map { _ in Float(0.25) }
+
+        // CPU reference: C = A×B + D
+        let refMatmul = cpuMatmul(a, m, k, b, k, n)
+        let ref = zip(refMatmul, d).map(+)
+
+        let gpu = try MetalMatrixMultiplier.matmulThenAdd(a: a, rowsA: m, colsA: k,
+                                                          b: b, rowsB: k, colsB: n,
+                                                          d: d,
+                                                          tileSize: 16)
+        for i in 0..<(m*n) {
+            #expect(abs(ref[i] - gpu[i]) < 1e-3, "Mismatch at index \(i): ref=\(ref[i]) gpu=\(gpu[i])")
+        }
+    }
 }

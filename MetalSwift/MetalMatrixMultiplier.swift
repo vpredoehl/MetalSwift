@@ -457,3 +457,64 @@ extension MetalMatrixMultiplier {
         return (bestSize, bestTime)
     }
 }
+
+// MARK: - GPU Vector Add and MatMul+Add
+extension MetalMatrixMultiplier {
+    /// Adds D into C on the GPU in-place. C and D must have the same count.
+    static func addInPlace(c: inout [Float], d: [Float]) throws {
+        enum AddErr: Error { case deviceUnavailable, commandQueueCreationFailed, libraryBuildFailed(String), functionNotFound, pipelineCreationFailed(String), bufferAllocationFailed, commandBufferCreationFailed, encoderCreationFailed, commandBufferError(String), sizeMismatch }
+        guard c.count == d.count else { throw AddErr.sizeMismatch }
+        guard let device = MTLCreateSystemDefaultDevice() else { throw AddErr.deviceUnavailable }
+        guard let commandQueue = device.makeCommandQueue() else { throw AddErr.commandQueueCreationFailed }
+
+        let source = """
+        #include <metal_stdlib>
+        using namespace metal;
+        kernel void vadd(device float* C [[ buffer(0) ]],
+                         device const float* D [[ buffer(1) ]],
+                         uint gid [[ thread_position_in_grid ]]) {
+            C[gid] += D[gid];
+        }
+        """
+        let library: MTLLibrary
+        do { library = try device.makeLibrary(source: source, options: nil) } catch { throw AddErr.libraryBuildFailed(String(describing: error)) }
+        guard let fn = library.makeFunction(name: "vadd") else { throw AddErr.functionNotFound }
+        let pipeline: MTLComputePipelineState
+        do { pipeline = try device.makeComputePipelineState(function: fn) } catch { throw AddErr.pipelineCreationFailed(String(describing: error)) }
+
+        let count = c.count
+        let bytes = MemoryLayout<Float>.stride * count
+        guard let bufC = device.makeBuffer(bytes: c, length: bytes, options: .storageModeShared),
+              let bufD = device.makeBuffer(bytes: d, length: bytes, options: .storageModeShared) else {
+            throw AddErr.bufferAllocationFailed
+        }
+
+        guard let cmd = commandQueue.makeCommandBuffer() else { throw AddErr.commandBufferCreationFailed }
+        guard let enc = cmd.makeComputeCommandEncoder() else { throw AddErr.encoderCreationFailed }
+        enc.setComputePipelineState(pipeline)
+        enc.setBuffer(bufC, offset: 0, index: 0)
+        enc.setBuffer(bufD, offset: 0, index: 1)
+        let w = pipeline.threadExecutionWidth
+        let threadsPerThreadgroup = MTLSize(width: w, height: 1, depth: 1)
+        let threadsPerGrid = MTLSize(width: count, height: 1, depth: 1)
+        enc.dispatchThreads(threadsPerGrid, threadsPerThreadgroup: threadsPerThreadgroup)
+        enc.endEncoding()
+        cmd.commit()
+        cmd.waitUntilCompleted()
+        if let e = cmd.error { throw AddErr.commandBufferError(e.localizedDescription) }
+        bufC.contents().copyMemory(to: &c, byteCount: bytes)
+    }
+
+    /// Computes C = A(m×k) × B(k×n) + D(m×n) fully on the GPU.
+    static func matmulThenAdd(a: [Float], rowsA: Int, colsA: Int,
+                              b: [Float], rowsB: Int, colsB: Int,
+                              d: [Float],
+                              tileSize: Int = 16) throws -> [Float] {
+        precondition(d.count == rowsA * colsB, "D must be m×n")
+        var c = try matmul(a: a, rowsA: rowsA, colsA: colsA,
+                           b: b, rowsB: rowsB, colsB: colsB,
+                           tileSize: tileSize)
+        try addInPlace(c: &c, d: d)
+        return c
+    }
+}
