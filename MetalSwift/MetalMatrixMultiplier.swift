@@ -357,3 +357,103 @@ private extension UnsafeMutableRawPointer {
         }
     }
 }
+
+// MARK: - Float16 conversion helpers
+extension MetalMatrixMultiplier {
+    // Convert Float32 array to IEEE 754 binary16 bit patterns (UInt16)
+    static func float32ToFloat16Bits(_ src: [Float]) -> [UInt16] {
+        return src.map { f in
+            var value = f
+            return withUnsafeBytes(of: &value) { bytes -> UInt16 in
+                let bits = bytes.load(as: UInt32.self)
+                let sign = UInt16((bits >> 16) & 0x8000)
+                var exp = Int((bits >> 23) & 0xFF) - 127 + 15
+                var mant = UInt32(bits & 0x7FFFFF)
+                if exp <= 0 {
+                    if exp < -10 { return sign } // underflow to zero
+                    // subnormal
+                    mant |= 0x800000
+                    let shift = UInt32(14 - exp)
+                    let halfMant = UInt16((mant >> (shift + 13)) & 0x3FF)
+                    return sign | halfMant
+                } else if exp >= 31 {
+                    // overflow to inf
+                    return sign | 0x7C00
+                } else {
+                    let halfExp = UInt16(exp & 0x1F)
+                    let halfMant = UInt16((mant >> 13) & 0x3FF)
+                    return sign | (halfExp << 10) | halfMant
+                }
+            }
+        }
+    }
+
+    // Convert IEEE 754 binary16 bit patterns (UInt16) to Float32 array
+    static func float16BitsToFloat32(_ src: [UInt16]) -> [Float] {
+        return src.map { h in
+            let sign = UInt32(h & 0x8000) << 16
+            let exp = UInt32(h & 0x7C00) >> 10
+            let mant = UInt32(h & 0x03FF)
+            var bits: UInt32
+            if exp == 0 {
+                if mant == 0 {
+                    bits = sign
+                } else {
+                    // subnormal
+                    var e = -14
+                    var m = mant
+                    while (m & 0x0400) == 0 { m <<= 1; e -= 1 }
+                    m &= 0x03FF
+                    bits = sign | UInt32(e + 127) << 23 | (m << 13)
+                }
+            } else if exp == 0x1F {
+                // inf/NaN
+                bits = sign | 0x7F800000 | (mant << 13)
+            } else {
+                let e = Int(exp) - 15 + 127
+                bits = sign | UInt32(e) << 23 | (mant << 13)
+            }
+            var f = Float.zero
+            withUnsafeMutableBytes(of: &f) { ptr in
+                ptr.storeBytes(of: bits, as: UInt32.self)
+            }
+            return f
+        }
+    }
+}
+
+// MARK: - Benchmarking helper
+extension MetalMatrixMultiplier {
+    /// Benchmarks several tile sizes and returns the best performing size and average time (ms).
+    /// - Parameters:
+    ///   - a, b: Input matrices (Float32)
+    ///   - rowsA, colsA, rowsB, colsB: Dimensions
+    ///   - candidates: Tile sizes to test (default [8, 16, 32])
+    ///   - iterations: Number of runs to average per candidate
+    /// - Returns: (bestTileSize, avgMilliseconds)
+    static func benchmarkTileSizes(a: [Float], rowsA: Int, colsA: Int,
+                                   b: [Float], rowsB: Int, colsB: Int,
+                                   candidates: [Int] = [8, 16, 32],
+                                   iterations: Int = 3) throws -> (Int, Double) {
+        precondition(iterations > 0)
+        var bestSize = candidates.first ?? 16
+        var bestTime = Double.infinity
+        for sz in candidates {
+            var total: Double = 0
+            for _ in 0..<iterations {
+                let start = CFAbsoluteTimeGetCurrent()
+                _ = try matmul(a: a, rowsA: rowsA, colsA: colsA,
+                                b: b, rowsB: rowsB, colsB: colsB,
+                                tileSize: sz)
+                let end = CFAbsoluteTimeGetCurrent()
+                total += (end - start) * 1000.0
+            }
+            let avg = total / Double(iterations)
+            if avg < bestTime {
+                bestTime = avg
+                bestSize = sz
+            }
+        }
+        return (bestSize, bestTime)
+    }
+}
