@@ -59,6 +59,8 @@ struct MetalMatrixMultiplier {
         #include <metal_stdlib>
         using namespace metal;
 
+        constant uint TILE_SIZE = 16;
+
         struct MatDims {
             uint rowsA;
             uint colsA;
@@ -66,23 +68,59 @@ struct MetalMatrixMultiplier {
             uint colsB;
         };
 
-        kernel void matmul(
+        kernel void matmul_tiled(
             device const float* A [[ buffer(0) ]],
             device const float* B [[ buffer(1) ]],
             device float* C [[ buffer(2) ]],
             constant MatDims& dims [[ buffer(3) ]],
-            uint2 gid [[ thread_position_in_grid ]]) {
-            uint row = gid.y;
-            uint col = gid.x;
-            if (row >= dims.rowsA || col >= dims.colsB) return;
+            uint2 tgp_id [[ threadgroup_position_in_grid ]],
+            uint2 tid [[ thread_position_in_threadgroup ]]) {
+
+            // Compute the row and column of the C element this thread will produce
+            const uint row = tgp_id.y * TILE_SIZE + tid.y;
+            const uint col = tgp_id.x * TILE_SIZE + tid.x;
+
+            threadgroup float As[TILE_SIZE][TILE_SIZE];
+            threadgroup float Bs[TILE_SIZE][TILE_SIZE];
 
             float sum = 0.0f;
-            for (uint k = 0; k < dims.colsA; ++k) {
-                float a = A[row * dims.colsA + k];
-                float b = B[k * dims.colsB + col];
-                sum += a * b;
+
+            // Number of tiles to iterate over along the K dimension
+            const uint numTiles = (dims.colsA + TILE_SIZE - 1) / TILE_SIZE;
+
+            for (uint t = 0; t < numTiles; ++t) {
+                // Global indices for the elements to load into shared tiles
+                const uint aCol = t * TILE_SIZE + tid.x;
+                const uint bRow = t * TILE_SIZE + tid.y;
+
+                // Load A tile element if in-bounds, else 0
+                if (row < dims.rowsA && aCol < dims.colsA) {
+                    As[tid.y][tid.x] = A[row * dims.colsA + aCol];
+                } else {
+                    As[tid.y][tid.x] = 0.0f;
+                }
+
+                // Load B tile element if in-bounds, else 0
+                if (bRow < dims.rowsB && col < dims.colsB) {
+                    Bs[tid.y][tid.x] = B[bRow * dims.colsB + col];
+                } else {
+                    Bs[tid.y][tid.x] = 0.0f;
+                }
+
+                threadgroup_barrier(mem_flags::mem_threadgroup);
+
+                // Compute partial sum for this tile
+                for (uint k = 0; k < TILE_SIZE; ++k) {
+                    sum += As[tid.y][k] * Bs[k][tid.x];
+                }
+
+                threadgroup_barrier(mem_flags::mem_threadgroup);
             }
-            C[row * dims.colsB + col] = sum;
+
+            // Write result if the output index is in-bounds
+            if (row < dims.rowsA && col < dims.colsB) {
+                C[row * dims.colsB + col] = sum;
+            }
         }
         """
 
@@ -93,8 +131,8 @@ struct MetalMatrixMultiplier {
             throw MetalMatMulError.libraryBuildFailed(String(describing: error))
         }
 
-        guard let function = library.makeFunction(name: "matmul") else {
-            throw MetalMatMulError.functionNotFound("matmul")
+        guard let function = library.makeFunction(name: "matmul_tiled") else {
+            throw MetalMatMulError.functionNotFound("matmul_tiled")
         }
 
         let pipeline: MTLComputePipelineState
@@ -129,11 +167,11 @@ struct MetalMatrixMultiplier {
         enc.setBuffer(bufC, offset: 0, index: 2)
         enc.setBuffer(dimsBuf, offset: 0, index: 3)
 
-        // One thread per output element
-        let w = pipeline.threadExecutionWidth
-        let h = max(1, pipeline.maxTotalThreadsPerThreadgroup / w)
-        let threadsPerThreadgroup = MTLSize(width: w, height: h, depth: 1)
-        let threadsPerGrid = MTLSize(width: colsC, height: rowsC, depth: 1)
+        let tile = 16
+        let threadsPerThreadgroup = MTLSize(width: tile, height: tile, depth: 1)
+        let tgWidth = (colsC + tile - 1) / tile
+        let tgHeight = (rowsC + tile - 1) / tile
+        let threadsPerGrid = MTLSize(width: tgWidth * tile, height: tgHeight * tile, depth: 1)
 
         enc.dispatchThreads(threadsPerGrid, threadsPerThreadgroup: threadsPerThreadgroup)
         enc.endEncoding()
@@ -161,3 +199,4 @@ private extension UnsafeMutableRawPointer {
         }
     }
 }
+
