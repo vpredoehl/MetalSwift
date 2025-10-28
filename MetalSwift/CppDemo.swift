@@ -13,3 +13,9 @@ func runSwiftDemo() {
         print("Swift Metal error: \(error.localizedDescription)")
     }
 }
+
+/// Call this from your app entry point to test the Objective-C++ bridge.
+/// Example:
+///   runCppDemo()
+/// This prints the result of a C++ vector addition.
+// runCppDemo()  // Uncomment to run the C++ demo

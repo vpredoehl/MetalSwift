@@ -35,3 +35,7 @@ do {
 } catch {
     print("MatMul error:", error.localizedDescription)
 }
+
+runSwiftDemo()
+runCppDemo()
+

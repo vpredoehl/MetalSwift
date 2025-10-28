@@ -6,11 +6,6 @@
 	objectVersion = 77;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		081C5C4A2EA3296E000B435E /* MetalVectorAdder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 081C5C492EA3296E000B435E /* MetalVectorAdder.swift */; };
-		081C5C762EA49354000B435E /* MetalMatrixMultiplierTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 081C5C692EA490F5000B435E /* MetalMatrixMultiplierTests.swift */; };
-/* End PBXBuildFile section */
-
 /* Begin PBXCopyFilesBuildPhase section */
 		08ACBF582EA0825F0020CA6B /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -24,8 +19,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		081C5C492EA3296E000B435E /* MetalVectorAdder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalVectorAdder.swift; sourceTree = "<group>"; };
-		081C5C692EA490F5000B435E /* MetalMatrixMultiplierTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalMatrixMultiplierTests.swift; sourceTree = "<group>"; };
 		081C5C6F2EA49324000B435E /* MetalSwiftTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MetalSwiftTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		08ACBF5A2EA0825F0020CA6B /* MetalSwift */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = MetalSwift; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -35,8 +28,16 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				MetalMatrixMultiplier.swift,
+				MetalMatrixMultiplierTests.swift,
 			);
 			target = 081C5C6E2EA49324000B435E /* MetalSwiftTests */;
+		};
+		0885ED322EB04D9800D0E7A6 /* Exceptions for "MetalSwift" folder in "MetalSwift" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				MetalMatrixMultiplierTests.swift,
+			);
+			target = 08ACBF592EA0825F0020CA6B /* MetalSwift */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -49,6 +50,7 @@
 		08ACBF5C2EA0825F0020CA6B /* MetalSwift */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
+				0885ED322EB04D9800D0E7A6 /* Exceptions for "MetalSwift" folder in "MetalSwift" target */,
 				081C5C782EA493A8000B435E /* Exceptions for "MetalSwift" folder in "MetalSwiftTests" target */,
 			);
 			path = MetalSwift;
@@ -80,8 +82,6 @@
 				08ACBF5C2EA0825F0020CA6B /* MetalSwift */,
 				081C5C702EA49324000B435E /* MetalSwiftTests */,
 				08ACBF5B2EA0825F0020CA6B /* Products */,
-				081C5C492EA3296E000B435E /* MetalVectorAdder.swift */,
-				081C5C692EA490F5000B435E /* MetalMatrixMultiplierTests.swift */,
 			);
 			sourceTree = "<group>";
 		};
@@ -194,7 +194,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				081C5C762EA49354000B435E /* MetalMatrixMultiplierTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -202,7 +201,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				081C5C4A2EA3296E000B435E /* MetalVectorAdder.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -295,6 +293,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "\"/Volumes/Developer SSD/MetalSwift/MetalSwift\"";
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
@@ -352,6 +351,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "\"/Volumes/Developer SSD/MetalSwift/MetalSwift\"";
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
@@ -367,6 +367,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "MetalSwift/Project-Bridging-Header.h";
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 			};
@@ -378,6 +379,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "MetalSwift/Project-Bridging-Header.h";
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 			};
