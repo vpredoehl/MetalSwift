@@ -182,7 +182,7 @@ struct MetalMatrixMultiplier {
             throw MetalMatMulError.libraryBuildFailed(String(describing: error))
         }
 
-        guard let f32Function = library.makeFunction(name: "matmul_tiled_f32") else {
+        guard (library.makeFunction(name: "matmul_tiled_f32")) != nil else {
             throw MetalMatMulError.functionNotFound("matmul_tiled_f32")
         }
         let constantValues = MTLFunctionConstantValues()
@@ -204,7 +204,7 @@ struct MetalMatrixMultiplier {
 
         bufA.contents().copyMemory(from: a, byteCount: bytesA)
         bufB.contents().copyMemory(from: b, byteCount: bytesB)
-        var dims = [UInt32(rowsA), UInt32(colsA), UInt32(rowsB), UInt32(colsB)]
+        let dims = [UInt32(rowsA), UInt32(colsA), UInt32(rowsB), UInt32(colsB)]
         dimsBuf.contents().copyMemory(from: dims, byteCount: MemoryLayout<UInt32>.stride * 4)
 
         guard let cmd = commandQueue.makeCommandBuffer() else { throw MetalMatMulError.commandBufferCreationFailed }
@@ -295,7 +295,7 @@ struct MetalMatrixMultiplier {
         var tileSizeConst: UInt32 = UInt32(tileSize)
         constantValues.setConstantValue(&tileSizeConst, type: .uint, index: 0)
 
-        guard let baseFunction = library.makeFunction(name: "matmul_tiled_f16") else {
+        guard (library.makeFunction(name: "matmul_tiled_f16")) != nil else {
             throw MetalMatMulError.functionNotFound("matmul_tiled_f16")
         }
         let specialized = try library.makeFunction(name: "matmul_tiled_f16", constantValues: constantValues)
@@ -313,7 +313,7 @@ struct MetalMatrixMultiplier {
 
         bufA.contents().copyMemory(from: a, byteCount: bytesA)
         bufB.contents().copyMemory(from: b, byteCount: bytesB)
-        var dims = [UInt32(rowsA), UInt32(colsA), UInt32(rowsB), UInt32(colsB)]
+        let dims = [UInt32(rowsA), UInt32(colsA), UInt32(rowsB), UInt32(colsB)]
         dimsBuf.contents().copyMemory(from: dims, byteCount: MemoryLayout<UInt32>.stride * 4)
 
         guard let cmd = commandQueue.makeCommandBuffer() else { throw MetalMatMulError.commandBufferCreationFailed }
@@ -367,7 +367,7 @@ extension MetalMatrixMultiplier {
             return withUnsafeBytes(of: &value) { bytes -> UInt16 in
                 let bits = bytes.load(as: UInt32.self)
                 let sign = UInt16((bits >> 16) & 0x8000)
-                var exp = Int((bits >> 23) & 0xFF) - 127 + 15
+                let exp = Int((bits >> 23) & 0xFF) - 127 + 15
                 var mant = UInt32(bits & 0x7FFFFF)
                 if exp <= 0 {
                     if exp < -10 { return sign } // underflow to zero

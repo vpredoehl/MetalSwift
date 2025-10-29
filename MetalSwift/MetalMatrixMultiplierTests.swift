@@ -23,7 +23,7 @@ struct MetalMatrixMultiplierTests {
     }
 
     func testF32Correctness() async throws {
-        let m = 7, k = 9, n = 5
+        let m = 50, k = 10, n = 10
         var a = [Float]()
         var b = [Float]()
         for i in 0..<(m*k) { a.append(Float((i * 7) % 13) / 3.0) }
@@ -40,7 +40,7 @@ struct MetalMatrixMultiplierTests {
     }
 
     func testF16RoundTripAndMatmul() async throws {
-        let m = 8, k = 8, n = 8
+        let m = 50, k = 10, n = 10
         let a32 = (0..<(m*k)).map { i in Float((i % 7) - 3) / 2.0 }
         let b32 = (0..<(k*n)).map { i in Float((i % 11) - 5) / 3.0 }
         let a16 = MetalMatrixMultiplier.float32ToFloat16Bits(a32)
@@ -58,7 +58,7 @@ struct MetalMatrixMultiplierTests {
     }
 
     func testBenchmarkHelper() async throws {
-        let m = 32, k = 32, n = 32
+        let m = 50, k = 10, n = 10
         let a = (0..<(m*k)).map { _ in Float.random(in: -1...1) }
         let b = (0..<(k*n)).map { _ in Float.random(in: -1...1) }
         let (best, avgMs) = try MetalMatrixMultiplier.benchmarkTileSizes(
@@ -73,7 +73,7 @@ struct MetalMatrixMultiplierTests {
 
     @Test("Matmul then Add (GPU+GPU) matches CPU reference")
     func testMatmulThenAddGPU() async throws {
-        let m = 6, k = 5, n = 4
+        let m = 50, k = 10, n = 10
         let a = (0..<(m*k)).map { Float(($0 * 7) % 13) / 3.0 }
         let b = (0..<(k*n)).map { Float(($0 * 11) % 17) / 5.0 }
         let d = (0..<(m*n)).map { _ in Float(0.25) }
