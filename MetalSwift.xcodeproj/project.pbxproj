@@ -35,6 +35,7 @@
 		0885ED322EB04D9800D0E7A6 /* Exceptions for "MetalSwift" folder in "MetalSwift" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				main.swift,
 				MetalMatrixMultiplierTests.swift,
 			);
 			target = 08ACBF592EA0825F0020CA6B /* MetalSwift */;
