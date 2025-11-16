@@ -13,7 +13,7 @@ import Metal
 import Foundation
 
 /// Runs a simple vector addition on the GPU using a C++/Objective-C++ Metal bridge and prints the result.
-@_silgen_name("cpp_gpu_vector_add")
+@_silgen_name("cpp_gpu_vector_add_shared")
 func cpp_gpu_vector_add(_ a: UnsafePointer<Float>, _ b: UnsafePointer<Float>, _ out: UnsafeMutablePointer<Float>, _ count: Int) -> Int32
 
 func runGpuDemo() {
