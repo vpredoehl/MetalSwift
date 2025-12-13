@@ -3,15 +3,14 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 77;
+	objectVersion = 90;
 	objects = {
 
 /* Begin PBXCopyFilesBuildPhase section */
 		08ACBF582EA0825F0020CA6B /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
 			dstPath = /usr/share/man/man1/;
-			dstSubfolderSpec = 0;
+			dstSubfolder = None;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 1;
@@ -21,6 +20,7 @@
 /* Begin PBXFileReference section */
 		081C5C6F2EA49324000B435E /* MetalSwiftTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MetalSwiftTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		08ACBF5A2EA0825F0020CA6B /* MetalSwift */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = MetalSwift; sourceTree = BUILT_PRODUCTS_DIR; };
+		08C285DB2EEBC045009ABB31 /* libMetalLib.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMetalLib.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -40,6 +40,17 @@
 			);
 			target = 08ACBF592EA0825F0020CA6B /* MetalSwift */;
 		};
+		08C285E02EEBC09F009ABB31 /* Exceptions for "MetalSwift" folder in "MetalLib" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				CppBridge.h,
+				CppGpuBridge.h,
+				CppGpuBridge.mm,
+				CppGpuMatMulAdd.h,
+				CppGpuMatMulAdd.mm,
+			);
+			target = 08C285DA2EEBC045009ABB31 /* MetalLib */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -53,6 +64,7 @@
 			exceptions = (
 				0885ED322EB04D9800D0E7A6 /* Exceptions for "MetalSwift" folder in "MetalSwift" target */,
 				081C5C782EA493A8000B435E /* Exceptions for "MetalSwift" folder in "MetalSwiftTests" target */,
+				08C285E02EEBC09F009ABB31 /* Exceptions for "MetalSwift" folder in "MetalLib" target */,
 			);
 			path = MetalSwift;
 			sourceTree = "<group>";
@@ -62,17 +74,18 @@
 /* Begin PBXFrameworksBuildPhase section */
 		081C5C6C2EA49324000B435E /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 		08ACBF572EA0825F0020CA6B /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
+		};
+		08C285D92EEBC045009ABB31 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
 		};
 /* End PBXFrameworksBuildPhase section */
 
@@ -91,11 +104,20 @@
 			children = (
 				08ACBF5A2EA0825F0020CA6B /* MetalSwift */,
 				081C5C6F2EA49324000B435E /* MetalSwiftTests.xctest */,
+				08C285DB2EEBC045009ABB31 /* libMetalLib.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		08C285D72EEBC045009ABB31 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			files = (
+			);
+		};
+/* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
 		081C5C6E2EA49324000B435E /* MetalSwiftTests */ = {
@@ -108,14 +130,10 @@
 			);
 			buildRules = (
 			);
-			dependencies = (
-			);
 			fileSystemSynchronizedGroups = (
 				081C5C702EA49324000B435E /* MetalSwiftTests */,
 			);
 			name = MetalSwiftTests;
-			packageProductDependencies = (
-			);
 			productName = MetalSwiftTests;
 			productReference = 081C5C6F2EA49324000B435E /* MetalSwiftTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -130,17 +148,28 @@
 			);
 			buildRules = (
 			);
-			dependencies = (
-			);
 			fileSystemSynchronizedGroups = (
 				08ACBF5C2EA0825F0020CA6B /* MetalSwift */,
 			);
 			name = MetalSwift;
-			packageProductDependencies = (
-			);
 			productName = MetalSwift;
 			productReference = 08ACBF5A2EA0825F0020CA6B /* MetalSwift */;
 			productType = "com.apple.product-type.tool";
+		};
+		08C285DA2EEBC045009ABB31 /* MetalLib */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 08C285DE2EEBC045009ABB31 /* Build configuration list for PBXNativeTarget "MetalLib" */;
+			buildPhases = (
+				08C285D72EEBC045009ABB31 /* Headers */,
+				08C285D82EEBC045009ABB31 /* Sources */,
+				08C285D92EEBC045009ABB31 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			name = MetalLib;
+			productName = MetalLib;
+			productReference = 08C285DB2EEBC045009ABB31 /* libMetalLib.a */;
+			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */
 
@@ -158,6 +187,9 @@
 					08ACBF592EA0825F0020CA6B = {
 						CreatedOnToolsVersion = 26.0.1;
 					};
+					08C285DA2EEBC045009ABB31 = {
+						CreatedOnToolsVersion = 26.1.1;
+					};
 				};
 			};
 			buildConfigurationList = 08ACBF552EA0825F0020CA6B /* Build configuration list for PBXProject "MetalSwift" */;
@@ -169,13 +201,14 @@
 			);
 			mainGroup = 08ACBF512EA0825F0020CA6B;
 			minimizedProjectReferenceProxies = 1;
-			preferredProjectObjectVersion = 77;
+			preferredProjectObjectVersion = 90;
 			productRefGroup = 08ACBF5B2EA0825F0020CA6B /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
 				08ACBF592EA0825F0020CA6B /* MetalSwift */,
 				081C5C6E2EA49324000B435E /* MetalSwiftTests */,
+				08C285DA2EEBC045009ABB31 /* MetalLib */,
 			);
 		};
 /* End PBXProject section */
@@ -183,32 +216,31 @@
 /* Begin PBXResourcesBuildPhase section */
 		081C5C6D2EA49324000B435E /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		081C5C6B2EA49324000B435E /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 		08ACBF562EA0825F0020CA6B /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
+		};
+		08C285D82EEBC045009ABB31 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		081C5C742EA49324000B435E /* Debug */ = {
+		081C5C742EA49324000B435E /* Debug configuration for PBXNativeTarget "MetalSwiftTests" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -225,7 +257,7 @@
 			};
 			name = Debug;
 		};
-		081C5C752EA49324000B435E /* Release */ = {
+		081C5C752EA49324000B435E /* Release configuration for PBXNativeTarget "MetalSwiftTests" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -242,7 +274,7 @@
 			};
 			name = Release;
 		};
-		08ACBF5F2EA0825F0020CA6B /* Debug */ = {
+		08ACBF5F2EA0825F0020CA6B /* Debug configuration for PBXProject "MetalSwift" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -306,7 +338,7 @@
 			};
 			name = Debug;
 		};
-		08ACBF602EA0825F0020CA6B /* Release */ = {
+		08ACBF602EA0825F0020CA6B /* Release configuration for PBXProject "MetalSwift" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -362,7 +394,7 @@
 			};
 			name = Release;
 		};
-		08ACBF622EA0825F0020CA6B /* Debug */ = {
+		08ACBF622EA0825F0020CA6B /* Debug configuration for PBXNativeTarget "MetalSwift" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -374,7 +406,7 @@
 			};
 			name = Debug;
 		};
-		08ACBF632EA0825F0020CA6B /* Release */ = {
+		08ACBF632EA0825F0020CA6B /* Release configuration for PBXNativeTarget "MetalSwift" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -386,34 +418,61 @@
 			};
 			name = Release;
 		};
+		08C285DC2EEBC045009ABB31 /* Debug configuration for PBXNativeTarget "MetalLib" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				EXECUTABLE_PREFIX = lib;
+				MACOSX_DEPLOYMENT_TARGET = 26.1;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		08C285DD2EEBC045009ABB31 /* Release configuration for PBXNativeTarget "MetalLib" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				EXECUTABLE_PREFIX = lib;
+				MACOSX_DEPLOYMENT_TARGET = 26.1;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
 		081C5C732EA49324000B435E /* Build configuration list for PBXNativeTarget "MetalSwiftTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				081C5C742EA49324000B435E /* Debug */,
-				081C5C752EA49324000B435E /* Release */,
+				081C5C742EA49324000B435E /* Debug configuration for PBXNativeTarget "MetalSwiftTests" */,
+				081C5C752EA49324000B435E /* Release configuration for PBXNativeTarget "MetalSwiftTests" */,
 			);
-			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 		08ACBF552EA0825F0020CA6B /* Build configuration list for PBXProject "MetalSwift" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				08ACBF5F2EA0825F0020CA6B /* Debug */,
-				08ACBF602EA0825F0020CA6B /* Release */,
+				08ACBF5F2EA0825F0020CA6B /* Debug configuration for PBXProject "MetalSwift" */,
+				08ACBF602EA0825F0020CA6B /* Release configuration for PBXProject "MetalSwift" */,
 			);
-			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 		08ACBF612EA0825F0020CA6B /* Build configuration list for PBXNativeTarget "MetalSwift" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				08ACBF622EA0825F0020CA6B /* Debug */,
-				08ACBF632EA0825F0020CA6B /* Release */,
+				08ACBF622EA0825F0020CA6B /* Debug configuration for PBXNativeTarget "MetalSwift" */,
+				08ACBF632EA0825F0020CA6B /* Release configuration for PBXNativeTarget "MetalSwift" */,
 			);
-			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		08C285DE2EEBC045009ABB31 /* Build configuration list for PBXNativeTarget "MetalLib" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				08C285DC2EEBC045009ABB31 /* Debug configuration for PBXNativeTarget "MetalLib" */,
+				08C285DD2EEBC045009ABB31 /* Release configuration for PBXNativeTarget "MetalLib" */,
+			);
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
