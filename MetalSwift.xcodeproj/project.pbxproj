@@ -27,7 +27,9 @@
 		081C5C782EA493A8000B435E /* Exceptions for "MetalSwift" folder in "MetalSwiftTests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				CppGpuMatMulAdd.mm,
 				MatMulAddDemo.cpp,
+				MatMulAddThunk.swift,
 				MetalMatrixMultiplier.swift,
 				MetalMatrixMultiplierTests.swift,
 			);
