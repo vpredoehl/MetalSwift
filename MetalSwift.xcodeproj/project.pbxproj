@@ -45,10 +45,12 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				CppBridge.h,
+				CppBridge.swift,
 				CppGpuBridge.h,
 				CppGpuBridge.mm,
 				CppGpuMatMulAdd.h,
 				CppGpuMatMulAdd.mm,
+				GpuDemos.cpp,
 				MatMulAddDemo.cpp,
 				MatMulAddThunk.swift,
 				MetalMatrixMultiplier.swift,
