@@ -145,7 +145,69 @@ static void runMatMulAddDemo() {
     printMatrix("C", C, rowsC, colsC);
 }
 
+static void runTensordotDemoCPU() {
+    // Small demo sizes
+    const int B = 2, W = 2, F = 3, O = 2;
+    // bwo shaped (B,W,F)
+    std::vector<float> bwo = {
+        // b=0
+        1, 2, 3,   // w=0, f=0..2
+        4, 5, 6,   // w=1
+        // b=1
+        7, 8, 9,   // w=0
+        10, 11, 12 // w=1
+    };
+    // fo shaped (F,O)
+    std::vector<float> fo = {
+        0.5f, 1.0f,
+        1.5f, 2.0f,
+        2.5f, 3.0f
+    };
+
+    // Output (B,W,O)
+    std::vector<float> C((size_t)B * (size_t)W * (size_t)O, 0.0f);
+
+    // Print input samples
+    printTensor3DSample("bwo", bwo, B, W, F);
+    printMatrixSample("fo", fo, F, O);
+
+    std::printf("Tensordot breakdown (C[b,w,o] = sum_f bwo[b,w,f]*fo[f,o]):\n");
+    for (int b = 0; b < B; ++b) {
+        for (int w = 0; w < W; ++w) {
+            for (int o = 0; o < O; ++o) {
+                std::printf("  C[b=%d,w=%d,o=%d] = ", b, w, o);
+                float sum = 0.0f;
+                for (int f = 0; f < F; ++f) {
+                    size_t idxBWO = (size_t)b * (size_t)W * (size_t)F + (size_t)w * (size_t)F + (size_t)f;
+                    size_t idxFO  = (size_t)f * (size_t)O + (size_t)o;
+                    float a = bwo[idxBWO];
+                    float bval = fo[idxFO];
+                    sum += a * bval;
+                    std::printf("%s(%g*%g)", (f==0?"":" + "), a, bval);
+                }
+                size_t idxOut = (size_t)b * (size_t)W * (size_t)O + (size_t)w * (size_t)O + (size_t)o;
+                C[idxOut] = sum;
+                std::printf(" = %g\n", sum);
+            }
+        }
+    }
+
+    // Print final C as (B,W,O) rows per (b,w)
+    std::printf("C (B=%d, W=%d, O=%d) sample:\n", B, W, O);
+    for (int b = 0; b < B; ++b) {
+        for (int w = 0; w < W; ++w) {
+            std::printf("  C[b=%d,w=%d]: [", b, w);
+            for (int o = 0; o < O; ++o) {
+                size_t idxOut = (size_t)b * (size_t)W * (size_t)O + (size_t)w * (size_t)O + (size_t)o;
+                std::printf("%s%g", (o==0?"":" "), C[idxOut]);
+            }
+            std::printf("]\n");
+        }
+    }
+}
+
 extern "C" void cpp_run_gpu_demos() {
     runVectorAddDemo();
     runMatMulAddDemo();
+    runTensordotDemoCPU();
 }
