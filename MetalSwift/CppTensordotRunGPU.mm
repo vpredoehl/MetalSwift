@@ -5,7 +5,7 @@
 #include <cstdint>
 #include <cstddef>
 
-extern "C" int tensordot_bwo_run_gpu(const float* bwo, int B, int W, int F, const float* fo, int O, float* out /* B*W*O */) {
+extern "C" int tensordot_gpu(const float* bwo, int B, int W, int F, const float* fo, int O, float* out /* B*W*O */) {
     if (!bwo || !fo || !out) return -1;
     if (B <= 0 || W <= 0 || F <= 0 || O <= 0) return -2;
 
@@ -45,6 +45,53 @@ extern "C" int tensordot_bwo_run_gpu(const float* bwo, int B, int W, int F, cons
 
     id<MTLBuffer> paramsBuf = [device newBufferWithBytes:&p length:sizeof(TDParams) options:MTLResourceStorageModeShared];
     if (!paramsBuf) return -16;
+
+    // Debug: show all input data and calculation steps for all outputs before GPU dispatch
+    {
+        printf("tensordot_bwo_run_gpu: Input tensors before GPU dispatch\n");
+        // Print bwo as [B][W][F]
+        printf("bwo [B=%d, W=%d, F=%d]:\n", B, W, F);
+        for (int b = 0; b < B; ++b) {
+            for (int w = 0; w < W; ++w) {
+                printf("  bwo[b=%d,w=%d,:] = [", b, w);
+                for (int f = 0; f < F; ++f) {
+                    size_t idxBWO = (size_t)b * (size_t)W * (size_t)F + (size_t)w * (size_t)F + (size_t)f;
+                    printf("%s%g", (f==0?"":" ,"), bwo[idxBWO]);
+                }
+                printf("]\n");
+            }
+        }
+        // Print fo as [F][O]
+        printf("fo [F=%d, O=%d]:\n", F, O);
+        for (int f = 0; f < F; ++f) {
+            printf("  fo[f=%d,:] = [", f);
+            for (int o = 0; o < O; ++o) {
+                size_t idxFO  = (size_t)f * (size_t)O + (size_t)o;
+                printf("%s%g", (o==0?"":" ,"), fo[idxFO]);
+            }
+            printf("]\n");
+        }
+
+        // Full breakdown of C[b,w,o] = sum_f bwo[b,w,f] * fo[f,o]
+        printf("tensordot_bwo_run_gpu breakdown (C[b,w,o] = sum_f bwo[b,w,f]*fo[f,o]):\n");
+        for (int b = 0; b < B; ++b) {
+            for (int w = 0; w < W; ++w) {
+                for (int o = 0; o < O; ++o) {
+                    printf("  C[b=%d,w=%d,o=%d] = ", b, w, o);
+                    float sum = 0.0f;
+                    for (int f = 0; f < F; ++f) {
+                        size_t idxBWO = (size_t)b * (size_t)W * (size_t)F + (size_t)w * (size_t)F + (size_t)f;
+                        size_t idxFO  = (size_t)f * (size_t)O + (size_t)o;
+                        float a = bwo[idxBWO];
+                        float bval = fo[idxFO];
+                        sum += a * bval;
+                        printf("%s(%g*%g)", (f==0?"":" + "), a, bval);
+                    }
+                    printf(" = %g\n", sum);
+                }
+            }
+        }
+    }
 
     id<MTLCommandBuffer> cmd = [queue commandBuffer];
     if (!cmd) return -17;
@@ -86,5 +133,32 @@ extern "C" int tensordot_bwo_run_gpu(const float* bwo, int B, int W, int F, cons
     // Copy results back
     memcpy(out, outBuf.contents, outCount * sizeof(float));
 
+    // Debug: show all outputs after GPU tensordot
+    {
+        printf("tensordot_bwo_run_gpu: Output tensor after GPU dispatch\n");
+        // Print full out as [B][W][O]
+        printf("out [B=%d, W=%d, O=%d]:\n", B, W, O);
+        for (int b = 0; b < B; ++b) {
+            for (int w = 0; w < W; ++w) {
+                printf("  out[b=%d,w=%d,:] = [", b, w);
+                for (int o = 0; o < O; ++o) {
+                    size_t idxOUT = (size_t)b * (size_t)W * (size_t)O + (size_t)w * (size_t)O + (size_t)o;
+                    printf("%s%g", (o==0?"":" ,"), out[idxOUT]);
+                }
+                printf("]\n");
+            }
+        }
+        // Sample line for [b=0,w=0,*]
+        if (B > 0 && W > 0) {
+            printf("TensorDot output sample [b=0,w=0,*]: ");
+            for (int o = 0; o < O; ++o) {
+                size_t idxOUT = (size_t)0 * (size_t)W * (size_t)O + (size_t)0 * (size_t)O + (size_t)o;
+                printf("%s%g", (o==0?"":" , "), out[idxOUT]);
+            }
+            printf("\n");
+        }
+    }
+
     return 0;
 }
+

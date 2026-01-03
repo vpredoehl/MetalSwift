@@ -11,38 +11,6 @@ extern "C" int cpp_gpu_tensordot_bwo_run(const float* bwo, int B, int W, int F, 
 void printTensor3DSample(const char* name, const std::vector<float>& data, int B, int W, int F, int maxB = 2, int maxW = 2, int maxF = 4);
 void printMatrixSample(const char* name, const std::vector<float>& data, int rows, int cols, int maxRows = 4, int maxCols = 4);
 
-// --- Simple sample printers for debugging tensors/matrices ---
-//static inline void printTensor3DSample(const char* name, const std::vector<float>& tensor, int B, int W, int F) {
-//    std::cout << name << " sample: showing first b=0.." << std::min(B, 1) - 1
-//              << ", w=0.." << std::min(W, 2) - 1 << ", f=0.." << std::min(F, 4) - 1 << std::endl;
-//    int maxB = std::min(B, 1);
-//    int maxW = std::min(W, 2);
-//    int maxF = std::min(F, 4);
-//    for (int b = 0; b < maxB; ++b) {
-//        for (int w = 0; w < maxW; ++w) {
-//            std::cout << "  (b=" << b << ", w=" << w << ", f=: ";
-//            for (int f = 0; f < maxF; ++f) {
-//                int idx = (b * W * F) + (w * F) + f;
-//                std::cout << tensor[idx] << (f + 1 < maxF ? ", " : ")\n");
-//            }
-//        }
-//    }
-//}
-//
-//static inline void printMatrixSample(const char* name, const std::vector<float>& mat, int rows, int cols) {
-//    std::cout << name << " sample: showing first rows=0.." << std::min(rows, 3) - 1
-//              << ", cols=0.." << std::min(cols, 4) - 1 << std::endl;
-//    int maxR = std::min(rows, 3);
-//    int maxC = std::min(cols, 4);
-//    for (int r = 0; r < maxR; ++r) {
-//        std::cout << "  [" << r << "] ";
-//        for (int c = 0; c < maxC; ++c) {
-//            int idx = r * cols + c;
-//            std::cout << mat[idx] << (c + 1 < maxC ? ", " : "\n");
-//        }
-//    }
-//}
-
 // This project previously used Swift as the entry point. To use this C++ main instead:
 // 1) Remove or exclude any Swift files that declare an entry (e.g., a type annotated with `@main`
 //    or a SwiftUI `App` conformer) from the build target.

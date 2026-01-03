@@ -6,7 +6,7 @@
 #include <cstddef>
 
 // GPU entry point (implemented elsewhere, e.g., via Metal). Should return 0 on success.
-extern "C" int tensordot_bwo_run_gpu(const float* bwo, int B, int W, int F, const float* fo, int O, float* out /* B*W*O */);
+extern "C" int tensordot_gpu(const float* bwo, int B, int W, int F, const float* fo, int O, float* out /* B*W*O */);
 
 // CPU fallback implementation
 static int tensordot_bwo_cpu(const float* bwo, int B, int W, int F, const float* fo, int O, float* out /* B*W*O */) {
@@ -43,7 +43,7 @@ extern "C" int cpp_gpu_tensordot_bwo_run(const float* bwo, int B, int W, int F, 
     // Try GPU first. If the GPU symbol is linked and returns success, we're done.
     // Note: If the GPU implementation is not linked, this call will still resolve at link time;
     // provide the symbol in your GPU module. Non-zero return indicates GPU failure.
-    int gpuStatus = tensordot_bwo_run_gpu(bwo, B, W, F, fo, O, out);
+    int gpuStatus = tensordot_gpu(bwo, B, W, F, fo, O, out);
     if (gpuStatus == 0) {
         return 0;
     }
