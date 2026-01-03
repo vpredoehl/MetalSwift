@@ -5,6 +5,43 @@
 
 extern "C" void cpp_run_matmul_add_demo();
 extern "C" void cpp_run_gpu_demos();
+extern "C" void cpp_gpu_tensordot_bwo_demo(int B, int W, int F, int O);
+extern "C" int cpp_gpu_tensordot_bwo_run(const float* bwo, int B, int W, int F, const float* fo, int O, float* out /* B*W*O */);
+
+void printTensor3DSample(const char* name, const std::vector<float>& data, int B, int W, int F, int maxB = 2, int maxW = 2, int maxF = 4);
+void printMatrixSample(const char* name, const std::vector<float>& data, int rows, int cols, int maxRows = 4, int maxCols = 4);
+
+// --- Simple sample printers for debugging tensors/matrices ---
+//static inline void printTensor3DSample(const char* name, const std::vector<float>& tensor, int B, int W, int F) {
+//    std::cout << name << " sample: showing first b=0.." << std::min(B, 1) - 1
+//              << ", w=0.." << std::min(W, 2) - 1 << ", f=0.." << std::min(F, 4) - 1 << std::endl;
+//    int maxB = std::min(B, 1);
+//    int maxW = std::min(W, 2);
+//    int maxF = std::min(F, 4);
+//    for (int b = 0; b < maxB; ++b) {
+//        for (int w = 0; w < maxW; ++w) {
+//            std::cout << "  (b=" << b << ", w=" << w << ", f=: ";
+//            for (int f = 0; f < maxF; ++f) {
+//                int idx = (b * W * F) + (w * F) + f;
+//                std::cout << tensor[idx] << (f + 1 < maxF ? ", " : ")\n");
+//            }
+//        }
+//    }
+//}
+//
+//static inline void printMatrixSample(const char* name, const std::vector<float>& mat, int rows, int cols) {
+//    std::cout << name << " sample: showing first rows=0.." << std::min(rows, 3) - 1
+//              << ", cols=0.." << std::min(cols, 4) - 1 << std::endl;
+//    int maxR = std::min(rows, 3);
+//    int maxC = std::min(cols, 4);
+//    for (int r = 0; r < maxR; ++r) {
+//        std::cout << "  [" << r << "] ";
+//        for (int c = 0; c < maxC; ++c) {
+//            int idx = r * cols + c;
+//            std::cout << mat[idx] << (c + 1 < maxC ? ", " : "\n");
+//        }
+//    }
+//}
 
 // This project previously used Swift as the entry point. To use this C++ main instead:
 // 1) Remove or exclude any Swift files that declare an entry (e.g., a type annotated with `@main`
@@ -27,6 +64,50 @@ int main(int argc, char* argv[]) {
     std::cout << "-- Running additional GPU demos --" << std::endl;
     cpp_run_gpu_demos();
 
+    std::cout << "-- Running TensorDot (B,W,F)·(F,O) demo (7,5,4)·(4,4) --" << std::endl;
+    {
+        const int B = 7, W = 5, F = 4, O = 4;
+        std::vector<float> bwo(B * W * F);
+        std::vector<float> fo(F * O);
+        std::vector<float> bwo_fo_out(B * W * O, 0.0f);
+
+        // Fill (B,W,F) tensor with a simple pattern: value = b*100 + w*10 + f
+        for (int b = 0; b < B; ++b) {
+            for (int w = 0; w < W; ++w) {
+                for (int f = 0; f < F; ++f) {
+                    int idx = (b * W * F) + (w * F) + f;
+                    bwo[idx] = static_cast<float>(b * 100 + w * 10 + f);
+                }
+            }
+        }
+        // Fill (F,O) matrix with value = f*10 + o
+        for (int f = 0; f < F; ++f) {
+            for (int o = 0; o < O; ++o) {
+                int idx = f * O + o;
+                fo[idx] = static_cast<float>(f * 10 + o);
+            }
+        }
+
+        // Assuming you have pointers and sizes:
+        // const float* bwo; int B, W, F;
+        // const float* fo;  int O;
+
+        printTensor3DSample("bwo", bwo, B, W, F); // shows (b,w) slices and first few Fs
+        printMatrixSample("fo", fo, F, O);        // shows first few rows/cols
+        
+        int tdStatus = cpp_gpu_tensordot_bwo_run(bwo.data(), B, W, F, fo.data(), O, bwo_fo_out.data());
+        if (tdStatus != 0) {
+            std::cerr << "cpp_gpu_tensordot_bwo_run failed (status=" << tdStatus << "). Falling back to cpp_gpu_tensordot_bwo_demo()" << std::endl;
+            cpp_gpu_tensordot_bwo_demo(7, 5, 4, 4);
+        } else {
+            std::cout << "TensorDot output sample [b=0,w=0,*]: ";
+            for (int o = 0; o < O; ++o) {
+                int idx = (0 * W * O) + (0 * O) + o;
+                std::cout << bwo_fo_out[idx] << (o + 1 < O ? ", " : "\n");
+            }
+        }
+    }
+
     // --- Activation Function Demos (Metal GPU) ---
     std::vector<float> activationInput = { -2, -1, 0, 1, 2 };
     std::vector<float> sigmoidOut(activationInput.size(), 0.0f), tanhOut(activationInput.size(), 0.0f);
@@ -43,3 +124,4 @@ int main(int argc, char* argv[]) {
 
     return 0;
 }
+
