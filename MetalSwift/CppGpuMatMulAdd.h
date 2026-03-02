@@ -7,6 +7,8 @@
 extern "C" {
 #endif
 
+void runCppMatMulAddDemoMetal();
+
 // Computes C = A(rowsA x colsA) * B(rowsB x colsB) + D(rowsA x colsB)
 // Arrays are row-major.
 // Returns 0 on success.

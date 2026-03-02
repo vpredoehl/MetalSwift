@@ -45,6 +45,8 @@ void runCppMatMulAddDemo() {
 }
 
 // Provide a C ABI entry point that Swift can call
-extern "C" void cpp_run_matmul_add_demo() {
+extern "C" void cpp_run_matmul_add_demo()
+{
+    runCppMatMulAddDemoMetal();
     runCppMatMulAddDemo();
 }

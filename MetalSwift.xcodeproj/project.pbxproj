@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		0834161B2F5557D800555025 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 083416172F5557AD00555025 /* Metal.framework */; };
+		0834161C2F5557E200555025 /* MetalPerformanceShaders.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 083416192F5557B700555025 /* MetalPerformanceShaders.framework */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXCopyFilesBuildPhase section */
 		08ACBF582EA0825F0020CA6B /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -20,6 +25,8 @@
 
 /* Begin PBXFileReference section */
 		081C5C6F2EA49324000B435E /* MetalSwiftTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MetalSwiftTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		083416172F5557AD00555025 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
+		083416192F5557B700555025 /* MetalPerformanceShaders.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalPerformanceShaders.framework; path = System/Library/Frameworks/MetalPerformanceShaders.framework; sourceTree = SDKROOT; };
 		08ACBF5A2EA0825F0020CA6B /* MetalSwift */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = MetalSwift; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -74,17 +81,29 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0834161C2F5557E200555025 /* MetalPerformanceShaders.framework in Frameworks */,
+				0834161B2F5557D800555025 /* Metal.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		083416162F5557AD00555025 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				083416192F5557B700555025 /* MetalPerformanceShaders.framework */,
+				083416172F5557AD00555025 /* Metal.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		08ACBF512EA0825F0020CA6B = {
 			isa = PBXGroup;
 			children = (
 				08ACBF5C2EA0825F0020CA6B /* MetalSwift */,
 				081C5C702EA49324000B435E /* MetalSwiftTests */,
+				083416162F5557AD00555025 /* Frameworks */,
 				08ACBF5B2EA0825F0020CA6B /* Products */,
 			);
 			sourceTree = "<group>";
